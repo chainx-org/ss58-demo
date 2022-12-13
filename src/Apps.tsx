@@ -1,14 +1,29 @@
 /** @format */
 import {Input} from 'antd'
 import React, {useState} from 'react'
-import {encodeAddress} from '@polkadot/keyring'
-import _encodeAddress from './encodeAddress'
-import _decodeAddress from './decodeAddress'
+import { decodeAddress, encodeAddress, Keyring } from '@polkadot/keyring';
+import { hexAddPrefix, u8aToHex } from '@polkadot/util';
 const {hexToU8a, isHex} = require('@polkadot/util')
 
 const Apps = () => {
   const [originValue, setOriginValue] = useState('')
   const [formatValue, setFormatValue] = useState('')
+
+// keyring.setSS58Format(process.env.REACT_APP_ENV === 'test' ? 42 : 44)
+// 42 for testnet, 44 for mainnet
+  const keyring = new Keyring()
+  keyring.setSS58Format(44)
+
+  const _decodeAddress = (address: string) => {
+    if (!address) return address
+    return u8aToHex(decodeAddress(address))
+  }
+
+  const _encodeAddress = (publicKey: string) => {
+    if (!publicKey) return publicKey
+    return keyring.encodeAddress(hexAddPrefix(publicKey))
+  }
+
   const inputValue = (e: any) => {
     const value = e.target.value
     setOriginValue(value)
